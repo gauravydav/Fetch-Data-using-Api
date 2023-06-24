@@ -1,23 +1,47 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
+  const [employees, setEmployees] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    fetch('https://reqres.in/api/users?page=2')
+      .then((response) => response.json())
+      .then((data) => setEmployees(data.data));
+  }, []);
+
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredEmployees = employees.filter((employee) =>
+    employee.first_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+      <h1>Employee List</h1>
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Search by first name"
+          value={searchTerm}
+          onChange={handleSearch}
+          className="search-input"
+        />
+      </div>
+      <div className="card-container">
+        {filteredEmployees.map((employee) => (
+          <div key={employee.id} className="employee-card">
+            <div className="employee-avatar">
+              <span className="employee-id">{employee.id}</span>
+              <img src={employee.avatar} alt="Avatar" />
+            </div>
+            <p className="employee-name">{employee.first_name}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
